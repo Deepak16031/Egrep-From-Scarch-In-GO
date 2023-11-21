@@ -25,6 +25,15 @@ func main() {
 		os.Exit(2)
 	}
 
+	if "\\d" == pattern {
+		ok := containsDigit(line)
+		if !ok {
+			os.Exit(1)
+		} else {
+			os.Exit(0)
+		}
+	}
+
 	ok, err := matchLine(line, pattern)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
@@ -36,6 +45,13 @@ func main() {
 	}
 
 	// default exit code is 0 which means success
+}
+
+func containsDigit(line []byte) bool {
+	digits := "0123456789"
+	var ok bool
+	ok = bytes.ContainsAny(line, digits)
+	return ok
 }
 
 func matchLine(line []byte, pattern string) (bool, error) {
