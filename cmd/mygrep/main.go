@@ -2,10 +2,11 @@ package main
 
 import (
 	"bytes"
+	"io"
+
 	// Uncomment this to pass the first stage
 	// "bytes"
 	"fmt"
-	"io"
 	"os"
 	"unicode/utf8"
 )
@@ -19,19 +20,15 @@ func main() {
 
 	pattern := os.Args[2]
 
-	line, err := io.ReadAll(os.Stdin) // assume we're only dealing with a single line
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: read input text: %v\n", err)
-		os.Exit(2)
-	}
+	//line := []byte("alpha-num3ric") // assume we're only dealing with a single line
+	line, err := io.ReadAll(os.Stdin)
 
 	if "\\d" == pattern {
 		ok := containsDigit(line)
-		if !ok {
-			os.Exit(1)
-		} else {
-			os.Exit(0)
-		}
+		exitOnOk(ok)
+	} else if "\\w" == pattern {
+		ok := isAlphaNumbers(line)
+		exitOnOk(ok)
 	}
 
 	ok, err := matchLine(line, pattern)
@@ -47,11 +44,31 @@ func main() {
 	// default exit code is 0 which means success
 }
 
+func exitOnOk(ok bool) {
+	if !ok {
+		os.Exit(1)
+	} else {
+		os.Exit(0)
+	}
+}
+
 func containsDigit(line []byte) bool {
 	digits := "0123456789"
 	var ok bool
 	ok = bytes.ContainsAny(line, digits)
 	return ok
+}
+
+func isAlphaNumbers(line []byte) bool {
+	for _, r := range line {
+		asciiValue := int(r)
+		isDigit := asciiValue >= 48 && asciiValue <= 57
+		isLiteral := (asciiValue >= 65 && asciiValue <= 90) || (asciiValue >= 97 && asciiValue <= 122)
+		if isDigit || isLiteral {
+			return true
+		}
+	}
+	return false
 }
 
 func matchLine(line []byte, pattern string) (bool, error) {
