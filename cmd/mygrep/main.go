@@ -20,7 +20,7 @@ func main() {
 	pattern := os.Args[2]
 
 	//line := []byte("alpha-num3ric") // assume we're only dealing with a single line
-	line, err := io.ReadAll(os.Stdin)
+	line, _ := io.ReadAll(os.Stdin)
 
 	if "\\d" == pattern {
 		ok := containsDigit(line)
@@ -28,15 +28,19 @@ func main() {
 	} else if "\\w" == pattern {
 		ok := isAlphaNumbers(line)
 		exitOnOk(ok)
+	} else if pattern[0] == '[' && pattern[1] == '^' && pattern[len(pattern)-1] == ']' {
+		ok := matchNotExist(line, pattern[2:len(pattern)-2])
+		exitOnOk(ok)
 	} else if pattern[0] == '[' && pattern[len(pattern)-1] == ']' {
 		pattern = pattern[1 : len(pattern)-1]
 	}
 
-	ok, err := matchLine(line, pattern)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(2)
-	}
+	ok := matchLine(line, pattern)
+	//ok, err := matchLine(line, pattern)
+	//if err != nil {
+	//	fmt.Fprintf(os.Stderr, "error: %v\n", err)
+	//	os.Exit(2)
+	//}
 
 	if !ok {
 		os.Exit(1)
@@ -72,7 +76,11 @@ func isAlphaNumbers(line []byte) bool {
 	return false
 }
 
-func matchLine(line []byte, pattern string) (bool, error) {
+func matchNotExist(line []byte, pattern string) bool {
+	return !matchLine(line, pattern)
+}
+
+func matchLine(line []byte, pattern string) bool {
 	//if utf8.RuneCountInString(pattern) != 1 {
 	//	return false, fmt.Errorf("unsupported pattern: %q", pattern)
 	//}
@@ -85,5 +93,6 @@ func matchLine(line []byte, pattern string) (bool, error) {
 	// Uncomment this to pass the first stage
 	ok = bytes.ContainsAny(line, pattern)
 
-	return ok, nil
+	//return ok, nil
+	return ok
 }
