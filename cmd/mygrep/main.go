@@ -8,7 +8,6 @@ import (
 	// "bytes"
 	"fmt"
 	"os"
-	"unicode/utf8"
 )
 
 // Usage: echo <input_text> | your_grep.sh -E <pattern>
@@ -29,6 +28,8 @@ func main() {
 	} else if "\\w" == pattern {
 		ok := isAlphaNumbers(line)
 		exitOnOk(ok)
+	} else if pattern[0] == '[' && pattern[len(pattern)-1] == ']' {
+		pattern = pattern[1 : len(pattern)-1]
 	}
 
 	ok, err := matchLine(line, pattern)
@@ -72,9 +73,9 @@ func isAlphaNumbers(line []byte) bool {
 }
 
 func matchLine(line []byte, pattern string) (bool, error) {
-	if utf8.RuneCountInString(pattern) != 1 {
-		return false, fmt.Errorf("unsupported pattern: %q", pattern)
-	}
+	//if utf8.RuneCountInString(pattern) != 1 {
+	//	return false, fmt.Errorf("unsupported pattern: %q", pattern)
+	//}
 
 	var ok bool
 
