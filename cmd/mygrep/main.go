@@ -51,7 +51,9 @@ func main() {
 
 func match(line []byte, pattern string) bool {
 	//try to match first char
-	if pattern[0] == '\\' {
+	if pattern[0] == '^' {
+		return matchUtil(line, pattern[1:])
+	} else if pattern[0] == '\\' {
 		if pattern[1] == 'd' {
 			for {
 				ok, indx := containsDigit(line)
