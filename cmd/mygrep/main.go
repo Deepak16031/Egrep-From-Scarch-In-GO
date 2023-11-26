@@ -22,9 +22,9 @@ func main() {
 	//}
 
 	pattern := os.Args[2]
-	//pattern := "\\d\\d\\d apples"
+	//pattern := "cat$"
 	line, _ := io.ReadAll(os.Stdin)
-	//line := []byte("sally has 124 apples")
+	//line := []byte("cat")
 
 	ok := match(line, pattern)
 
@@ -145,13 +145,15 @@ func matchUtil(line []byte, pattern string) bool {
 			}
 			lineIndx++
 			i += classEndIndx + 1
+		} else if r == '$' {
+			return len(line) == lineIndx
 		} else if r == line[lineIndx] {
 			lineIndx++
 		} else {
 			return false
 		}
 	}
-	return i == len(pattern)
+	return i == len(pattern) || (pattern[i] == '$') // for loop breaking conditions simplifies the logic
 }
 
 //func matchCharClassInStart(line []byte, pattern string) (bool, bool) {
