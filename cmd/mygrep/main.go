@@ -22,9 +22,9 @@ func main() {
 	//}
 
 	pattern := os.Args[2]
-	//pattern := "\\w \\w[^abc]ple"
+	//pattern := "\\d\\d\\d apples"
 	line, _ := io.ReadAll(os.Stdin)
-	//line := []byte("sally has 3 apple")
+	//line := []byte("sally has 124 apples")
 
 	ok := match(line, pattern)
 
@@ -113,7 +113,7 @@ func matchUtil(line []byte, pattern string) bool {
 		if r == '\\' {
 			if pattern[i+1] == 'd' {
 				ok, indx := containsDigit(line[lineIndx:])
-				if !ok || indx != lineIndx {
+				if !ok || indx != 0 {
 					return false
 				}
 			} else if pattern[i+1] == 'w' {
