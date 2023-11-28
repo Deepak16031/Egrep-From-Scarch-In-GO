@@ -22,9 +22,9 @@ func main() {
 	//}
 
 	pattern := os.Args[2]
-	//pattern := "cat$"
+	//pattern := " \\d+ apple"
 	line, _ := io.ReadAll(os.Stdin)
-	//line := []byte("cat")
+	//line := []byte(" 11 apple")
 
 	ok := match(line, pattern)
 
@@ -110,8 +110,10 @@ func match(line []byte, pattern string) bool {
 func matchUtil(line []byte, pattern string) bool {
 	lineIndx := 0
 	i := 0
+	var lastPatternIndexStart int
 	for i = 0; i < len(pattern) && lineIndx < len(line); i++ {
 		r := pattern[i]
+		classStartIndex := i
 		if r == '\\' {
 			if pattern[i+1] == 'd' {
 				ok, indx := containsDigit(line[lineIndx:])
@@ -149,9 +151,14 @@ func matchUtil(line []byte, pattern string) bool {
 			return len(line) == lineIndx
 		} else if r == line[lineIndx] {
 			lineIndx++
+		} else if r == '+' {
+			if i != 0 && matchUtil(line[lineIndx:], pattern[lastPatternIndexStart:]) {
+				return true
+			}
 		} else {
 			return false
 		}
+		lastPatternIndexStart = classStartIndex
 	}
 	return i == len(pattern) || (pattern[i] == '$') // for loop breaking conditions simplifies the logic
 }
